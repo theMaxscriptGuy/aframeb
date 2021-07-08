@@ -1,0 +1,112 @@
+<html>
+
+<head>
+    <script src="https://aframe.io/releases/1.0.4/aframe.min.js"></script>
+
+<style>
+  .arjs-loader {
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .arjs-loader div {
+    text-align: center;
+    font-size: 1.25em;
+    color: white;
+  }
+</style>
+
+<script src='https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar-nft.js'></script>
+</head>
+
+<body style='margin : 0px; overflow: hidden;'>
+  <div class="arjs-loader">
+    <div>Loading, please wait...</div>
+  </div>
+    <a-scene
+        vr-mode-ui="enabled: false;"
+        renderer="logarithmicDepthBuffer: true;"
+        embedded arjs='trackingMethod: best; sourceType: webcam; debugUIEnabled: false;'>
+
+        <!-- <a-assets>
+            <a-asset-item id="tree-obj" src="./Thousand_Dollar.obj"></a-asset-item>
+            <a-asset-item id="tree-mtl" src="./Thousand_Dollar.mtl"></a-asset-item>
+          </a-assets> -->
+
+        <a-nft
+            type='nft' url='https://arjs-cors-proxy.herokuapp.com/https://raw.githack.com/AR-js-org/AR.js/master/aframe/examples/image-tracking/nft/trex/trex-image/trex'
+            smooth='true' smoothCount='10' smoothTolerance='0.01' smoothThreshold='5'>
+            <a-entity id="objmodel"
+                gltf-model='./models/gltf/football/scene.gltf'
+                scale="15 15 15"
+                position="100 100 -10" foo
+                >
+            </a-entity>
+            <!-- <a-entity  id="objmodel" obj-model="obj: #tree-obj; mtl: #tree-mtl" scale="10 10 10"
+                position="100 100 0" rotation="0 0 0" foo>
+              </a-entity> -->
+            </a-nft>
+		<a-entity camera></a-entity>
+    </a-scene>
+
+  <script src="./dist/hammer.js"></script>
+    <script>
+        AFRAME.registerComponent("foo", {
+          init: function () {
+            var element = document.querySelector('body');
+            var model = document.querySelector('#objmodel');
+            var hammertime = new Hammer(element);
+            hammertime.get('pinch').set({ enable: true });
+            var scaleVar = 0.2;
+            var maxScale = 20;
+            var minScale = 5;
+    
+            hammertime.on('pinch', (ev) => {
+              let scale = model.getAttribute("scale")
+    
+              if (ev.additionalEvent == 'pinchout') {
+                if (scale.x <= maxScale) {
+                  scale.x += scaleVar;
+                  scale.y += scaleVar;
+                  scale.z += scaleVar;
+                }
+              }
+              else if (ev.additionalEvent == 'pinchin') {
+                if (scale.x >= minScale) {
+                  scale.x -= scaleVar;
+                  scale.y -= scaleVar;
+                  scale.z -= scaleVar;
+                }
+              }
+              console.log("pinch ", scale)
+              model.setAttribute("scale", scale)
+            });
+    
+            hammertime.on('pan', (ev) => {
+              let rotation = model.getAttribute("rotation")
+              switch (ev.direction) {
+                case 2:
+                  rotation.y = rotation.y + 4
+                  break;
+                case 4:
+                  rotation.y = rotation.y - 4
+                  break;
+                default:
+                  break;
+              }
+              model.setAttribute("rotation", rotation)
+            });
+          }
+        });
+      </script>
+</body>
+
+</html>
